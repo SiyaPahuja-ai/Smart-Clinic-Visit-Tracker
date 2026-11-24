@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Clinic Visit Tracker - Dr. Siya's Clinic</title>
+    <!-- Google Font: Plus Jakarta Sans for crisp, razor-sharp rendering -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Style Sheet (Green + White Healthcare Dashboard) -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ========================================================
+         LEFT SIDEBAR (Dark Green: #146C43)
+         ======================================================== -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo-icon">✚</div>
+            <div class="sidebar-brand-text">
+                <h5>DR. SIYA'S CLINIC</h5>
+                <span>SMART VISIT TRACKER</span>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="nav-item">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#registration" class="nav-link" data-section="registration">
+                    <span class="nav-icon">📝</span>
+                    <span>Patient Registration</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#patients" class="nav-link" data-section="patients">
+                    <span class="nav-icon">👥</span>
+                    <span>Patient Records</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#appointments" class="nav-link" data-section="appointments">
+                    <span class="nav-icon">📅</span>
+                    <span>Appointment Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#queue" class="nav-link" data-section="queue">
+                    <span class="nav-icon">🎟️</span>
+                    <span>Token Queue</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#history" class="nav-link" data-section="history">
+                    <span class="nav-icon">📋</span>
+                    <span>Visit History</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#reports" class="nav-link" data-section="reports">
+                    <span class="nav-icon">📈</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#settings" class="nav-link" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <div class="avatar">DS</div>
+                <div class="profile-info">
+                    <div class="name">Dr. Siya</div>
+                    <div class="role">Chief Medical Officer (M.D.)</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ========================================================
+         MAIN CONTENT WRAPPER
+         ======================================================== -->
+    <div class="main-wrapper">
+        
+        <!-- Top Navigation Bar (White: #FFFFFF) -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="toggle-sidebar-btn" id="sidebar-toggle">☰</button>
+                <div class="page-title">
+                    <h4 id="page-heading">Dashboard</h4>
+                    <p>Healthcare Visit & Queue Management System</p>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="date-pill" id="current-date">
+                    Loading date...
+                </div>
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span>SQLite Connected</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area with 8 Tabs -->
+        <main class="content-container">
+
+            <!-- ========================================================
+                 PAGE 1: DASHBOARD
+                 ======================================================== -->
+            <section id="section-dashboard" class="app-section active-section">
+                
+                <!-- Doctor Overview Banner -->
+                <div class="doctor-banner">
+                    <div class="doctor-banner-left">
+                        <div class="doctor-badge-icon">🩺</div>
+                        <div class="doctor-title-text">
+                            <h4>Dr. Siya (M.B.B.S., M.D.)</h4>
+                            <p>Consulting Physician • Outpatient Consultation (OPD)</p>
+                        </div>
+                    </div>
+                    <div class="banner-action-btns">
+                        <button class="btn-primary-green" onclick="openRegisterPatientModal()">+ Register Patient</button>
+                        <button class="btn-soft-green" onclick="openBookAppointmentModal()">+ Book Appointment</button>
+                    </div>
+                </div>
+
+                <!-- 4 Statistic Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-green">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-title">Total Patients</span>
+                            <span class="stat-value" id="stat-total-patients">0</span>
+                            <span class="stat-desc">Registered Patients</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-dark">📅</div>
+                        <div class="stat-info">
+                            <span class="stat-title">Today's Appointments</span>
+                            <span class="stat-value" id="stat-today-appointments">0</span>
+                            <span class="stat-desc">Scheduled for Today</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-green">✓</div>
+                        <div class="stat-info">
+                            <span class="stat-title">Completed Consultations</span>
+                            <span class="stat-value" id="stat-completed-consultations">0</span>
+                            <span class="stat-desc">Visits Completed</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-amber">⏱</div>
+                        <div class="stat-info">
+                            <span class="stat-title">Waiting Patients</span>
+                            <span class="stat-value" id="stat-waiting-patients">0</span>
+                            <span class="stat-desc">In Token Queue</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 Analytics Chart Panels -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="custom-card h-100">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h5 class="card-title">Appointment Overview</h5>
+                                    <p class="card-subtitle">Scheduled, completed, and cancelled visits</p>
+                                </div>
+                            </div>
+                            <div style="height: 260px;">
+                                <canvas id="chart-overview"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="custom-card h-100">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h5 class="card-title">Appointment Status</h5>
+                                    <p class="card-subtitle">Distribution breakdown</p>
+                                </div>
+                            </div>
+                            <div style="height: 260px;">
+                                <canvas id="chart-status"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Appointments Table -->
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Recent Appointments</h5>
+                            <p class="card-subtitle">Latest booked tokens and consultations</p>
+                        </div>
+                        <button class="btn-soft-green" onclick="loadDashboard()">🔄 Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Token #</th>
+                                    <th>Patient Name</th>
+                                    <th>Patient ID</th>
+                                    <th>Time</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-appointments-tbody">
+                                <tr><td colspan="7" class="text-center py-4">Loading appointments...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 2: PATIENT REGISTRATION
+                 ======================================================== -->
+            <section id="section-registration" class="app-section">
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="custom-card">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h5 class="card-title">New Patient Registration</h5>
+                                    <p class="card-subtitle">Enter patient demographics to generate a unique ID and initiate clinic record</p>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-semibold">Patient Intake</span>
+                            </div>
+                            
+                            <form id="page-register-patient-form" onsubmit="handlePageRegisterPatient(event)">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Patient Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" id="page-reg-name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Age (Years) <span class="text-danger">*</span></label>
+                                        <input type="number" id="page-reg-age" class="form-control" min="1" max="120" placeholder="e.g. 35" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+                                        <select id="page-reg-gender" class="form-select" required>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                                        <input type="tel" id="page-reg-phone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="10-digit mobile number" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Emergency Contact / City</label>
+                                        <input type="text" id="page-reg-city" class="form-control" placeholder="e.g. Delhi NCR">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Primary Medical Symptoms / Initial Complaint</label>
+                                        <textarea id="page-reg-notes" class="form-control" rows="3" placeholder="Enter patient's reason for visit, e.g. acute fever, dry cough, hypertension checkup..."></textarea>
+                                    </div>
+                                    <div class="col-12 pt-2 d-flex gap-3">
+                                        <button type="submit" class="btn-primary-green px-4 py-2">
+                                            ✓ Register Patient
+                                        </button>
+                                        <button type="reset" class="btn btn-outline-secondary px-4 py-2">
+                                            Reset Form
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="custom-card mb-4">
+                            <h5 class="card-title mb-3">Registration Guidelines</h5>
+                            <div class="guideline-item mb-3 d-flex gap-3 align-items-start">
+                                <div class="fs-4">🪪</div>
+                                <div>
+                                    <strong class="d-block text-dark">Automated Unique ID</strong>
+                                    <small class="text-muted">A sequential alphanumeric identifier (e.g. PAT-013) is generated in SQLite.</small>
+                                </div>
+                            </div>
+                            <div class="guideline-item mb-3 d-flex gap-3 align-items-start">
+                                <div class="fs-4">🎟️</div>
+                                <div>
+                                    <strong class="d-block text-dark">Instant Token Issuance</strong>
+                                    <small class="text-muted">Immediately after registration, the patient can be booked for a consultation token in the FIFO queue.</small>
+                                </div>
+                            </div>
+                            <div class="guideline-item d-flex gap-3 align-items-start">
+                                <div class="fs-4">💾</div>
+                                <div>
+                                    <strong class="d-block text-dark">Database Persistence</strong>
+                                    <small class="text-muted">All details remain safely stored in the local SQLite database across restarts.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="custom-card" style="background-color: var(--light-green); border: 1px solid var(--soft-green);">
+                            <h6 class="fw-bold text-success mb-2">⚡ Quick Links</h6>
+                            <p class="small text-muted mb-3">View all existing patient records or book an appointment:</p>
+                            <button class="btn btn-sm btn-outline-success w-100 mb-2" onclick="switchSection('patients')">Browse Patient Records →</button>
+                            <button class="btn btn-sm btn-success w-100" onclick="openBookAppointmentModal()">+ Book Appointment</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 3: PATIENT RECORDS
+                 ======================================================== -->
+            <section id="section-patients" class="app-section">
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Patient Records</h5>
+                            <p class="card-subtitle">Directory of all registered clinic patients</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group" style="width: 280px;">
+                                <input type="text" id="patient-search-input" class="form-control" placeholder="Search by name, ID or phone..." onkeyup="searchPatients()">
+                            </div>
+                            <button class="btn-primary-green" onclick="openRegisterPatientModal()">+ Register New Patient</button>
+                        </div>
+                    </div>
+
+                    <!-- Searchable Patient Table -->
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient ID</th>
+                                    <th>Patient Name</th>
+                                    <th>Age</th>
+                                    <th>Gender</th>
+                                    <th>Phone Number</th>
+                                    <th>Visits Done</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-table-tbody">
+                                <tr><td colspan="7" class="text-center py-4">Loading patient records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 4: APPOINTMENTS MANAGEMENT
+                 ======================================================== -->
+            <section id="section-appointments" class="app-section">
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Appointment Management</h5>
+                            <p class="card-subtitle">Schedule, reschedule, and cancel consultation visits</p>
+                        </div>
+                        <button class="btn-primary-green" onclick="openBookAppointmentModal()">+ Schedule Appointment</button>
+                    </div>
+
+                    <!-- Filters Bar -->
+                    <div class="row g-3 mb-4 p-3 rounded" style="background-color: var(--light-green); border: 1px solid var(--soft-green);">
+                        <div class="col-md-4">
+                            <label class="form-label small">Filter by Status:</label>
+                            <select id="apt-filter-status" class="form-select" onchange="loadAppointments()">
+                                <option value="ALL">All Statuses</option>
+                                <option value="SCHEDULED">Scheduled / Waiting</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Filter by Date:</label>
+                            <input type="date" id="apt-filter-date" class="form-control" onchange="loadAppointments()">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Sort by (Comparator):</label>
+                            <select id="apt-sort-by" class="form-select" onchange="loadAppointments()">
+                                <option value="token">Token Number (FIFO)</option>
+                                <option value="time">Appointment Time</option>
+                                <option value="name">Patient Name</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Apt ID</th>
+                                    <th>Token #</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Patient Details</th>
+                                    <th>Reason / Symptoms</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-table-tbody">
+                                <tr><td colspan="8" class="text-center py-4">Loading appointments...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 5: TOKEN QUEUE (FIFO)
+                 ======================================================== -->
+            <section id="section-queue" class="app-section">
+                <!-- Prominent Current Token Panel -->
+                <div class="queue-hero-card">
+                    <div class="queue-hero-left">
+                        <h5>Current Calling Token (Doctor Cabin)</h5>
+                        <div class="token-big-badge" id="hero-token-number">#---</div>
+                        <div class="queue-hero-name" id="hero-patient-name">No Patient In Queue</div>
+                        <div class="queue-hero-meta" id="hero-patient-meta">Queue is currently clear.</div>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <button class="btn-primary-green px-4 py-3 fs-6" onclick="callNextPatient()">
+                            📢 CALL NEXT PATIENT (FIFO)
+                        </button>
+                        <button id="hero-complete-btn" class="btn btn-outline-success py-2" style="display: none;">
+                            ✓ Complete Consultation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clean Waiting List Table -->
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Waiting Queue (FIFO Order)</h5>
+                            <p class="card-subtitle">Sequence managed by Java <code>Queue&lt;Appointment&gt;</code></p>
+                        </div>
+                        <button class="btn-soft-green" onclick="loadQueue()">🔄 Refresh Queue</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Queue Position</th>
+                                    <th>Token Number</th>
+                                    <th>Patient Name</th>
+                                    <th>Patient ID</th>
+                                    <th>Appointment Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-table-tbody">
+                                <tr><td colspan="6" class="text-center py-4">Loading waiting queue...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 6: VISIT HISTORY
+                 ======================================================== -->
+            <section id="section-history" class="app-section">
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Patient Visit History</h5>
+                            <p class="card-subtitle">Previous consultations recorded in SQLite database</p>
+                        </div>
+                        <div style="width: 320px;">
+                            <select id="history-patient-select" class="form-select" onchange="handleHistoryPatientSelect()">
+                                <option value="">-- Choose Registered Patient --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Selected Patient Profile Summary -->
+                    <div id="history-patient-card" class="p-3 mb-4 rounded" style="display: none; background-color: var(--light-green); border: 1px solid var(--soft-green);">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold mb-1" id="hp-name" style="color: var(--dark-green);">Patient Name</h5>
+                                <span class="badge bg-success me-2" id="hp-id">ID</span>
+                                <span class="text-muted" id="hp-meta">Age / Gender / Phone</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-dark fs-6" id="hp-visits">0 Visits</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Organized Timeline -->
+                    <div id="history-timeline-container">
+                        <div class="text-center py-5 text-muted">
+                            Please select a patient from the dropdown above to view their consultation history.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 7: REPORTS AND ANALYTICS
+                 ======================================================== -->
+            <section id="section-reports" class="app-section">
+                <div class="custom-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h5 class="card-title">Reports & Analytics</h5>
+                            <p class="card-subtitle">Daily operational metrics calculated via Java Streams</p>
+                        </div>
+                        <button class="btn-primary-green" onclick="printReports()">🖨️ Print Report</button>
+                    </div>
+
+                    <!-- Report KPI Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="p-3 rounded border text-center bg-white">
+                                <div class="text-muted small">Total Registered Patients</div>
+                                <div class="fs-2 fw-bold" style="color: var(--primary-green);" id="report-total-patients">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded border text-center bg-white">
+                                <div class="text-muted small">Total Appointments</div>
+                                <div class="fs-2 fw-bold text-dark" id="report-total-appointments">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded border text-center bg-white">
+                                <div class="text-muted small">Today's Visits</div>
+                                <div class="fs-2 fw-bold text-dark" id="report-today-appointments">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded border text-center bg-white">
+                                <div class="text-muted small">Average Waiting Time</div>
+                                <div class="fs-2 fw-bold" style="color: var(--primary-green);" id="report-avg-wait">0 mins</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Formatted Statistics Table -->
+                    <div class="table-responsive mb-4">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Status Category</th>
+                                    <th>Count & Ratio</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="status-badge badge-scheduled">⏳ Scheduled Appointments</span></td>
+                                    <td><strong id="report-scheduled-count">0</strong></td>
+                                    <td>Patients currently waiting in the consultation queue</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-badge badge-completed">✅ Completed Consultations</span></td>
+                                    <td><strong id="report-completed-count">0</strong></td>
+                                    <td>Consultations successfully completed with diagnosis & prescription</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-badge badge-cancelled">❌ Cancelled Appointments</span></td>
+                                    <td><strong id="report-cancelled-count">0</strong></td>
+                                    <td>Appointments cancelled and safely excluded from queue</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-muted small">
+                        Report generated at: <span id="report-generated-timestamp">Just now</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 PAGE 8: SETTINGS
+                 ======================================================== -->
+            <section id="section-settings" class="app-section">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="custom-card">
+                            <h5 class="card-title mb-3">Clinic Information</h5>
+                            <div class="form-group">
+                                <label class="form-label">Doctor Name</label>
+                                <input type="text" class="form-control" value="Dr. Siya (M.B.B.S., M.D.)" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Facility Name</label>
+                                <input type="text" class="form-control" value="Smart Clinic Healthcare Center" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Working Hours</label>
+                                <input type="text" class="form-control" value="09:00 AM - 05:00 PM (Monday - Saturday)" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="custom-card">
+                            <h5 class="card-title mb-3">System Information</h5>
+                            <div class="form-group">
+                                <label class="form-label">Backend Platform</label>
+                                <input type="text" class="form-control" value="Core Java (JDK 17) with Built-in HttpServer" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Database Persistence</label>
+                                <input type="text" class="form-control" value="SQLite 3 (clinic.db via JDBC Driver)" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Java Concepts</label>
+                                <input type="text" class="form-control" value="OOP, ArrayList, Queue, Comparator, Streams, JDBC" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ========================================================
+         MODALS (Clean & Non-Blurry)
+         ======================================================== -->
+
+    <!-- Modal 1: Register Patient -->
+    <div class="modal-overlay" id="modal-register-patient">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>Register New Patient</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-register-patient')">×</button>
+            </div>
+            <form id="register-patient-form" onsubmit="handleRegisterPatient(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Patient Full Name *</label>
+                        <input type="text" id="reg-patient-name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Age *</label>
+                            <input type="number" id="reg-patient-age" class="form-control" min="1" max="120" placeholder="e.g. 30" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="reg-patient-gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" id="reg-patient-phone" class="form-control" placeholder="e.g. 9876543210" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeModal('modal-register-patient')">Cancel</button>
+                    <button type="submit" class="btn-primary-green">Save Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Edit Patient -->
+    <div class="modal-overlay" id="modal-edit-patient">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>Edit Patient Information</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-edit-patient')">×</button>
+            </div>
+            <form onsubmit="handleEditPatient(event)">
+                <input type="hidden" id="edit-patient-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="edit-patient-name" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Age *</label>
+                            <input type="number" id="edit-patient-age" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="edit-patient-gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" id="edit-patient-phone" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeModal('modal-edit-patient')">Cancel</button>
+                    <button type="submit" class="btn-primary-green">Update Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Book Appointment -->
+    <div class="modal-overlay" id="modal-book-appointment">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>Schedule Consultation Appointment</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-book-appointment')">×</button>
+            </div>
+            <form onsubmit="handleBookAppointment(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Patient *</label>
+                        <select id="book-patient-select" class="form-select" required>
+                            <option value="">-- Choose Patient --</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Appointment Date *</label>
+                            <input type="date" id="book-apt-date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Appointment Time *</label>
+                            <input type="time" id="book-apt-time" class="form-control" value="10:00" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Visit / Symptoms</label>
+                        <textarea id="book-apt-reason" class="form-control" rows="2" placeholder="e.g. Mild fever, cold, routine health checkup"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeModal('modal-book-appointment')">Cancel</button>
+                    <button type="submit" class="btn-primary-green">Confirm & Issue Token</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Reschedule Appointment -->
+    <div class="modal-overlay" id="modal-reschedule-appointment">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>Reschedule Appointment</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-reschedule-appointment')">×</button>
+            </div>
+            <form onsubmit="handleRescheduleAppointment(event)">
+                <input type="hidden" id="resched-apt-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">New Date *</label>
+                        <input type="date" id="resched-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Time (HH:mm) *</label>
+                        <input type="time" id="resched-time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeModal('modal-reschedule-appointment')">Cancel</button>
+                    <button type="submit" class="btn-primary-green">Save New Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5: Complete Consultation -->
+    <div class="modal-overlay" id="modal-complete-consultation">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>Complete Consultation & Record Visit</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-complete-consultation')">×</button>
+            </div>
+            <form onsubmit="handleCompleteConsultation(event)">
+                <input type="hidden" id="consult-apt-id">
+                <div class="modal-body">
+                    <div class="p-2 mb-3 rounded" style="background-color: var(--light-green); font-size: 13px;">
+                        <strong>Patient:</strong> <span id="consult-modal-info" class="text-success fw-bold">Patient Name</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Waiting Time (minutes) *</label>
+                        <input type="number" id="consult-wait-time" class="form-control" min="0" value="15" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Doctor Diagnosis *</label>
+                        <input type="text" id="consult-diagnosis" class="form-control" placeholder="e.g. Viral Bronchitis, Migraine" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label d-flex justify-content-between align-items-center">
+                            <span>Doctor Prescription & Dawai (Rx) *</span>
+                            <span class="small text-muted" style="font-size: 11px;">Click below to add:</span>
+                        </label>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Tab Paracetamol 650mg TDS')">+ Paracetamol 650mg</button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Tab Azithromycin 500mg OD x 3d')">+ Azithromycin 500mg</button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Cap Pantoprazole 40mg OD before food')">+ Pantoprazole 40mg</button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Tab Cetirizine 10mg HS')">+ Cetirizine 10mg</button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Syrup Ascoril 10ml TDS')">+ Cough Syrup 10ml</button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;" onclick="addDawaPreset('Tab Amoxicillin 500mg BD x 5d')">+ Amoxicillin 500mg</button>
+                        </div>
+                        <textarea id="consult-prescription" class="form-control" rows="2" placeholder="e.g. Tab Paracetamol 650mg TDS x 3 days, Syrup Ascoril 10ml TDS"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeModal('modal-complete-consultation')">Cancel</button>
+                    <button type="submit" class="btn-primary-green">Save Visit & Issue Dawai</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 6: View Prescription & Dawai Details -->
+    <div class="modal-overlay" id="modal-view-dawa">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h5>💊 Medical Prescription & Dawai (Rx)</h5>
+                <button class="close-modal-btn" onclick="closeModal('modal-view-dawa')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prescription-header border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0" style="color: var(--dark-green);">DR. SIYA'S CLINIC</h6>
+                        <small class="text-muted">Outpatient Consultation • Dr. Siya (M.B.B.S., M.D.)</small>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1" id="dawa-modal-date">Date</span>
+                </div>
+                
+                <div class="p-2 mb-3 rounded" style="background-color: var(--light-green); border: 1px solid var(--soft-green);">
+                    <div class="row g-1 small">
+                        <div class="col-7"><strong>Patient:</strong> <span id="dawa-modal-patient" class="text-dark fw-bold">Patient Name</span></div>
+                        <div class="col-5 text-end"><strong>ID:</strong> <span id="dawa-modal-id" class="badge bg-success">P101</span></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small mb-1">Medical Problem / Diagnosis:</label>
+                    <div class="p-2 rounded bg-light border text-dark fw-semibold" id="dawa-modal-diagnosis">
+                        Diagnosis details
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small mb-1">Prescribed Medicines & Dosage (Dawai):</label>
+                    <div class="p-3 rounded border" style="background-color: #F8FBF9; border-left: 4px solid var(--primary-green) !important;" id="dawa-modal-prescription">
+                        Prescription list
+                    </div>
+                </div>
+
+                <div class="p-2 rounded bg-white border small text-muted">
+                    ℹ️ <strong>Doctor's Advice:</strong> Take medicines as directed with warm water. Complete the full course. Follow up if symptoms persist.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" onclick="closeModal('modal-view-dawa')">Close</button>
+                <button type="button" class="btn-primary-green" onclick="window.print()">🖨️ Print Rx Slip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Application Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
